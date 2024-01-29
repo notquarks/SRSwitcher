@@ -9,6 +9,7 @@ namespace SRSwitcher.Models
     public struct Account
     {
         public int Id { get; set; }
+        public string Img { get; set; }
         public string Username { get; set; }
         public string UID { get; set; }
         public int Level { get; set; }

@@ -12,17 +12,13 @@ namespace SRSwitcher.Views.Pages
     {
         public DashboardViewModel ViewModel { get; }
 
-        public DashboardPage(DashboardViewModel viewModel)
+        public DashboardPage(DashboardViewModel viewModel, IContentDialogService contentDialogService)
         {
             ViewModel = viewModel;
             DataContext = this;
 
             InitializeComponent();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
+            contentDialogService.SetContentPresenter(DashboardContentDialog);
         }
     }
 }

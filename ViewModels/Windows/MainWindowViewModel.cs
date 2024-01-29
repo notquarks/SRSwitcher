@@ -25,10 +25,16 @@ namespace SRSwitcher.ViewModels.Windows
             },
             new NavigationViewItem()
             {
-                Content = "Data",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
-                TargetPageType = typeof(Views.Pages.DataPage)
+                Content = "Settings",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.Settings24 },
+                TargetPageType = typeof(Views.Pages.SettingsPage)
             }
+            //new NavigationViewItem()
+            //{
+            //    Content = "Data",
+            //    Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
+            //    TargetPageType = typeof(Views.Pages.DataPage)
+            //}
         };
 
         [ObservableProperty]

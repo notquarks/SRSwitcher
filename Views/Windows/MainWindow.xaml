@@ -19,8 +19,10 @@
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
+    ResizeMode="NoResize"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+
     <Grid ShowGridLines="False">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*" />
@@ -29,16 +31,14 @@
         <ui:NavigationView
             x:Name="NavigationView"
             Grid.Row="1"
-            Padding="42,0,42,0"
+            Padding="12,0,12,0"
             BreadcrumbBar="{Binding ElementName=BreadcrumbBar}"
-            FooterMenuItemsSource="{Binding ViewModel.FooterMenuItems, Mode=OneWay}"
-            FrameMargin="0"
-            
+            FontSize="11"
+            FrameMargin="4"
             IsBackButtonVisible="Auto"
             IsPaneToggleVisible="True"
             MenuItemsSource="{Binding ViewModel.MenuItems, Mode=OneWay}"
-            PaneDisplayMode="LeftMinimal"
-            OpenPaneLength="240"
+            PaneDisplayMode="LeftFluent"
             >
             <ui:NavigationView.Header>
                 <ui:BreadcrumbBar x:Name="BreadcrumbBar" Margin="42,32,42,20" />
@@ -50,7 +50,7 @@
             </ui:NavigationView.ContentOverlay>
         </ui:NavigationView>
 
-        <ContentPresenter
+        <ContentPresenter 
             x:Name="RootContentDialog"
             Grid.Row="0"
             Grid.RowSpan="2" />

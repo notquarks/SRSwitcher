@@ -5,11 +5,14 @@
 
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SRSwitcher.Controls;
 using SRSwitcher.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Shapes;
@@ -19,7 +22,23 @@ namespace SRSwitcher.ViewModels.Pages
 {
     public partial class DashboardViewModel : ObservableObject, INavigationAware
     {
+        public DashboardViewModel(IContentDialogService contentDialogService)
+        {
+            _contentDialogService = contentDialogService;
+        }
+
+        private readonly IContentDialogService _contentDialogService;
+
         private bool _isInitialized = false;
+
+        [ObservableProperty]
+        private ObservableCollection<string> _avatarUrls;
+
+        [ObservableProperty]
+        private string _selectedAvatarUrl;
+
+        [ObservableProperty]
+        private string _dialogResultText = string.Empty;
 
         [ObservableProperty]
         private int _counter = 0;
@@ -29,6 +48,31 @@ namespace SRSwitcher.ViewModels.Pages
 
         [ObservableProperty]
         private Setting _settings;
+
+        [ObservableProperty]
+        private string _usernameInput;
+        [ObservableProperty]
+        private string _uidInput;
+        [ObservableProperty]
+        private int _levelInput;
+
+        public string Username
+        {
+            get { return _usernameInput; }
+            set { SetProperty(ref _usernameInput, value); }
+        }
+
+        public string UID
+        {
+            get { return _uidInput; }
+            set { SetProperty(ref _uidInput, value); }
+        }
+
+        public int Level
+        {
+            get { return _levelInput; }
+            set { SetProperty(ref _levelInput, value); }
+        }
 
         public void OnNavigatedFrom() { }
 
@@ -49,7 +93,7 @@ namespace SRSwitcher.ViewModels.Pages
         [RelayCommand]
         private void LoadData()
         {
-            var accPath = System.IO.Path.Combine(Environment.CurrentDirectory, "accounts.json");
+            var accPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "accounts.json");
             if(File.Exists(accPath))
             { 
                 var accJson = File.ReadAllText(accPath);
@@ -121,18 +165,25 @@ namespace SRSwitcher.ViewModels.Pages
             string token = EncryptToken(GetRegistryValue(), keyAndIV);
             //string token = GetRegistryValue();
             int newId = GetNextAccountId();
-
+            Debug.WriteLine($"Adding {Username} Account");
             Accounts.Add(new Account
             {
                 Id = newId,
-                Username = "NewUser",
-                UID = Guid.NewGuid().ToString(),
-                Level = 1,
+                Username = Username,
+                UID = UID,
+                Level = Level,
+                Img = "https://upload-os-bbs.hoyolab.com/upload/2023/11/22/90ed0534fea5a132b90e798bd455b51c_2408891332889206101.png",
+                //Username = "NewUser",
+                //UID = Guid.NewGuid().ToString(),
+                //Level = 1,
                 Server = "Asia",
                 Token = token,
                 ModifiedDate = DateTime.Now,
                 CreatedDate = DateTime.Now
             });
+            Username = string.Empty;
+            UID = string.Empty;
+            Level = 0;
             var newJson = JsonConvert.SerializeObject(Accounts, Formatting.Indented);
             File.WriteAllText(path, newJson);
         }
@@ -158,6 +209,48 @@ namespace SRSwitcher.ViewModels.Pages
             var newJson = JsonConvert.SerializeObject(Accounts, Formatting.Indented);
             File.WriteAllText(path, newJson);
         }
+
+        [RelayCommand]
+        private async Task OnShowDialog(object content)
+        {
+            var result = await _contentDialogService.ShowSimpleDialogAsync(
+                new SimpleContentDialogCreateOptions()
+                {
+                    Title = "Save an Account",
+                    Content = content,
+                    PrimaryButtonText = "Save",
+                    CloseButtonText = "Cancel",
+                }
+            );
+
+            switch (result) 
+            {
+                case ContentDialogResult.Primary:
+                    AddAccount();
+                    DialogResultText = "User saved their work";
+                    break;
+                default:
+                    DialogResultText = "User cancelled the dialog";
+                    break;
+            }
+            //DialogResultText = result switch
+            //{
+            //    ContentDialogResult.Primary => AddAccount(),
+            //    ContentDialogResult.Secondary => "User did not save their work",
+            //    _ => "User cancelled the dialog"
+            //};
+        }
+
+
+        [RelayCommand]
+        private async Task OnShowSignInContentDialog()
+        {
+            var termsOfUseContentDialog = new TermsOfUseContentDialog(
+                _contentDialogService.GetContentPresenter()
+            );
+            await termsOfUseContentDialog.ShowAsync();
+        }
+
 
         private int GetNextAccountId()
         {

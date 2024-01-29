@@ -6,7 +6,8 @@
     xmlns:local="clr-namespace:SRSwitcher.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:SRSwitcher.Models"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:custom="clr-namespace:ModalControl;assembly=ModalControl"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="DashboardPage"
     d:DataContext="{d:DesignInstance local:DashboardPage,
                                      IsDesignTimeCreatable=False}"
@@ -18,84 +19,93 @@
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
 
-    <Grid Margin="0,0,0,16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="56"/>
-        </Grid.RowDefinitions>
-        <ui:VirtualizingItemsControl 
+    <Page.Resources >
+        <ResourceDictionary >
+            <StackPanel x:Key="DialogContent" Height="200" >
+                <Label Content="Username"/>
+                <ui:TextBox PlaceholderText="Enter Your Username" x:Name="UsernameInput" Text="{Binding ViewModel.UsernameInput, Mode=TwoWay}" MaxLines="1"/>
+                <Label Content="UID" Margin="0,8,0,0"/>
+                <ui:NumberBox PlaceholderText="Enter Your UID" x:Name="UIDInput" Text="{Binding  ViewModel.UidInput, Mode=TwoWay}"  MaxLines="1"/>
+                <Label Content="Level" Margin="0,8,0,0"/>
+                <ui:NumberBox PlaceholderText="Enter Your Level" x:Name="LevelInput" Text="{Binding  ViewModel.LevelInput, Mode=TwoWay}"  MaxLines="1"/>
+            </StackPanel>
+        </ResourceDictionary>
+    </Page.Resources>
+    <Grid>
+        <ContentPresenter 
+            x:Name="DashboardContentDialog"
+            Grid.Row="0" 
+            Panel.ZIndex="10" Margin="-185,-165,-115,-85"
+            
+            />
+
+        <Grid Margin="0,0,0,16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="56"/>
+            </Grid.RowDefinitions>
+            <ui:VirtualizingItemsControl 
             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
             ItemsSource="{Binding ViewModel.Accounts, Mode=OneWay}"
             VirtualizingPanel.CacheLengthUnit="Item">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type models:Account}">
-                    <Border CornerRadius="18" BorderThickness="2" BorderBrush="{DynamicResource ApplicationBackgroundBrush}" Margin="3">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                <GradientStop Color="#212121" Offset="1"/>
-                                <GradientStop Color="#252525" Offset="0.8"/>
-                                <GradientStop Color="#282828" Offset="0"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Border.Clip>
-                            <RectangleGeometry RadiusX="12" RadiusY="12" Rect="0,0,200,190"></RectangleGeometry>
-                        </Border.Clip>
-                        <Grid Background="Transparent" Width="150" Height="190" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="False">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <!-- Make border Perfect Circle -->
-                            <Border Grid.ColumnSpan="3" Grid.RowSpan="3" Background="FloralWhite" CornerRadius="100" Width="81" Height="81" Margin="4" BorderThickness="4" BorderBrush="#424242">
-                                <ui:Image 
-  Source="https://img-os-static.hoyolab.com/communityWeb/upload/8c7b07ded1b46539de62545a4f7b2d05.png" CornerRadius="100"/>
-                            </Border>
-                            <StackPanel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="Bottom">
-                                <ui:TextBlock Text="{Binding Username}"   FontSize="16" Foreground="White" TextAlignment="Center" VerticalAlignment="Center"/>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <ui:TextBlock Text="UID. "   FontSize="8" Foreground="AntiqueWhite" TextAlignment="Center" VerticalAlignment="Center"/>
-                                    <ui:TextBlock Text="{Binding UID}"   FontSize="10" Foreground="AntiqueWhite" TextAlignment="Center" VerticalAlignment="Center"/>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:Account}">
+                        <Border CornerRadius="12,12,0,0" BorderThickness="2" Margin="3" BorderBrush="{ui:ThemeResource CardStrokeColorDefaultBrush}" Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}">
+                            <Grid Background="Transparent" Width="150" Height="190" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="False">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <!-- Make border Perfect Circle -->
+                                <Border Grid.ColumnSpan="3" Grid.RowSpan="3" Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="100" Width="81" Height="81" Margin="4" BorderThickness="4" BorderBrush="#424242">
+                                    <ui:Image 
+  Source="{Binding Img}" CornerRadius="100"/>
+                                </Border>
+                                <StackPanel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="Bottom">
+                                    <ui:TextBlock Text="{Binding Username}"   FontSize="16" Foreground="{DynamicResource TextFillColorPrimaryBrush}" TextAlignment="Center" VerticalAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <ui:TextBlock Text="UID. "   FontSize="8" Foreground="{DynamicResource TextFillColorPrimaryBrush}" TextAlignment="Center" VerticalAlignment="Center"/>
+                                        <ui:TextBlock Text="{Binding UID}"   FontSize="10" Foreground="{DynamicResource TextFillColorPrimaryBrush}" TextAlignment="Center" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <ui:TextBlock Text="Lv. "   FontSize="8" Foreground="{DynamicResource TextFillColorPrimaryBrush}" TextAlignment="Center" VerticalAlignment="Center"/>
+                                            <ui:TextBlock Text="{Binding Level}"   FontSize="10" Foreground="{DynamicResource TextFillColorPrimaryBrush}" TextAlignment="Center" VerticalAlignment="Center"/>
+                                    </StackPanel>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <ui:TextBlock Text="Lv. "   FontSize="8" Foreground="AntiqueWhite" TextAlignment="Center" VerticalAlignment="Center"/>
-                                    <ui:TextBlock Text="{Binding Level}"   FontSize="10" Foreground="AntiqueWhite" TextAlignment="Center" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </StackPanel>
-                            <ui:Button Grid.Row="4" Grid.Column="0" Icon="{ui:SymbolIcon Edit32}" Width="80" Height="40"  HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="#181818" 
+                                <ui:Button Grid.Row="4" Grid.Column="0" Icon="{ui:SymbolIcon Edit32}" Width="80" Height="40"  HorizontalAlignment="Center" VerticalAlignment="Bottom" 
                                        Command="{Binding DataContext.ViewModel.EditAccountCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
                                        CommandParameter="{Binding Id}"/>
-                            <ui:Button Grid.Row="4" Grid.Column="1" Icon="{ui:SymbolIcon Play32}" Width="80" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="#181818"
+                                <ui:Button Grid.Row="4" Grid.Column="1" Icon="{ui:SymbolIcon Play32}" Width="80" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom"
                                        Command="{Binding DataContext.ViewModel.PlayAccountCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
                                         CommandParameter="{Binding Id}"
                                        />
-                            <ui:Button Grid.Row="4" Grid.Column="2" Icon="{ui:SymbolIcon Delete32}" Width="80" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="#181818"
+                                <ui:Button Grid.Row="4" Grid.Column="2" Icon="{ui:SymbolIcon Delete32}" Width="80" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom"
                                        Command="{Binding DataContext.ViewModel.DeleteAccountCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
                                        CommandParameter="{Binding Id}"
                                        />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ui:VirtualizingItemsControl>
-        <Grid Grid.Row="1" Grid.Column="0" Margin="4" VerticalAlignment="Bottom">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <ui:TextBlock Grid.Row="0" Grid.Column="0" FontSize="18">Options</ui:TextBlock>
-            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <ui:Button Icon="{ui:SymbolIcon Add28}" Content="Add"  Foreground="White" Padding="10,4,10,4" Height="32" Margin="0" Appearance="Success" Command="{Binding ViewModel.AddAccountCommand, Mode=OneWay}"/>
-                <ui:Button Content="Load" Margin="8,2,8,2"/>
-                <ui:Button Content="Play" Margin="8,2,8,2"/>
-            </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ui:VirtualizingItemsControl>
+            <Grid Grid.Row="1" Grid.Column="0" Margin="4" VerticalAlignment="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:TextBlock Grid.Row="0" Grid.Column="0" FontSize="18" Margin="10,0,10,0">Options</ui:TextBlock>
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <ui:Button Icon="{ui:SymbolIcon Add28}" Content="Add"  Foreground="White" Padding="10,4,10,4" Height="32" Margin="10,0,10,0" Appearance="Success" Command="{Binding ViewModel.ShowDialogCommand}" CommandParameter="{StaticResource DialogContent}"/>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Page>
