@@ -6,7 +6,6 @@
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SRSwitcher.Controls;
 using SRSwitcher.Models;
 using System;
 using System.Collections.ObjectModel;
@@ -240,17 +239,6 @@ namespace SRSwitcher.ViewModels.Pages
             //    _ => "User cancelled the dialog"
             //};
         }
-
-
-        [RelayCommand]
-        private async Task OnShowSignInContentDialog()
-        {
-            var termsOfUseContentDialog = new TermsOfUseContentDialog(
-                _contentDialogService.GetContentPresenter()
-            );
-            await termsOfUseContentDialog.ShowAsync();
-        }
-
 
         private int GetNextAccountId()
         {
