@@ -20,5 +20,6 @@ namespace SRSwitcher.Views.Pages
             InitializeComponent();
             contentDialogService.SetContentPresenter(DashboardContentDialog);
         }
+
     }
 }

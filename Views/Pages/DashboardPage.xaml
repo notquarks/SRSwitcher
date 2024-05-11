@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:SRSwitcher.Models"
     xmlns:system="clr-namespace:System;assembly=System.Runtime"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:local1="clr-namespace:SRSwitcher.Converters"
     Title="DashboardPage"
     d:DataContext="{d:DesignInstance local:DashboardPage,
                                      IsDesignTimeCreatable=False}"
@@ -21,7 +21,16 @@
 
     <Page.Resources >
         <ResourceDictionary >
-            <StackPanel x:Key="DialogContent" Height="200" >
+            <local1:MyMultiValueConverter x:Key="MyMultiValueConverter"/>
+            <StackPanel x:Key="AddDialogContent" Height="200" >
+                <Label Content="Username"/>
+                <ui:TextBox PlaceholderText="Enter Your Username" x:Name="UsernameInput" Text="{Binding ViewModel.UsernameInput, Mode=TwoWay}" MaxLines="1"/>
+                <Label Content="UID" Margin="0,8,0,0"/>
+                <ui:NumberBox PlaceholderText="Enter Your UID" x:Name="UIDInput" Text="{Binding  ViewModel.UidInput, Mode=TwoWay}"  MaxLines="1"/>
+                <Label Content="Level" Margin="0,8,0,0"/>
+                <ui:NumberBox PlaceholderText="Enter Your Level" x:Name="LevelInput" Text="{Binding  ViewModel.LevelInput, Mode=TwoWay}"  MaxLines="1"/>
+            </StackPanel>
+            <StackPanel x:Key="EditDialogContent" Height="200" >
                 <Label Content="Username"/>
                 <ui:TextBox PlaceholderText="Enter Your Username" x:Name="UsernameInput" Text="{Binding ViewModel.UsernameInput, Mode=TwoWay}" MaxLines="1"/>
                 <Label Content="UID" Margin="0,8,0,0"/>
@@ -82,7 +91,14 @@
                                 </StackPanel>
                                 <ui:Button Grid.Row="4" Grid.Column="0" Icon="{ui:SymbolIcon Edit32}" Width="80" Height="40"  HorizontalAlignment="Center" VerticalAlignment="Bottom" 
                                        Command="{Binding DataContext.ViewModel.EditAccountCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
-                                       CommandParameter="{Binding Id}"/>
+                                       >
+                                    <Button.CommandParameter>
+                                        <MultiBinding Converter="{StaticResource MyMultiValueConverter}">
+                                            <Binding Path="Id"/>
+                                            <Binding Source="{StaticResource EditDialogContent}"/>
+                                        </MultiBinding>
+                                    </Button.CommandParameter>
+                                </ui:Button>
                                 <ui:Button Grid.Row="4" Grid.Column="1" Icon="{ui:SymbolIcon Play32}" Width="80" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom"
                                        Command="{Binding DataContext.ViewModel.PlayAccountCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
                                         CommandParameter="{Binding Id}"
@@ -103,7 +119,7 @@
                 </Grid.ColumnDefinitions>
                 <ui:TextBlock Grid.Row="0" Grid.Column="0" FontSize="18" Margin="10,0,10,0">Options</ui:TextBlock>
                 <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <ui:Button Icon="{ui:SymbolIcon Add28}" Content="Add"  Foreground="White" Padding="10,4,10,4" Height="32" Margin="10,0,10,0" Appearance="Success" Command="{Binding ViewModel.ShowDialogCommand}" CommandParameter="{StaticResource DialogContent}"/>
+                    <ui:Button Icon="{ui:SymbolIcon Add28}" Content="Add"  Foreground="White" Padding="10,4,10,4" Height="32" Margin="10,0,10,0" Appearance="Success" Command="{Binding ViewModel.AddAccountShowDialogCommand}" CommandParameter="{StaticResource AddDialogContent}"/>
                 </StackPanel>
             </Grid>
         </Grid>

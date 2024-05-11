@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Shapes;
@@ -188,12 +189,18 @@ namespace SRSwitcher.ViewModels.Pages
         }
 
         [RelayCommand]
-        private void EditAccount(int Id)
+        private void EditAccount(object[] value)
         {
-            //edit account item based on selected index
-            //var account = Accounts[SelectedIndex];
-            Debug.WriteLine($"Selected Account: {Accounts.Where(x => x.Id == Id).FirstOrDefault().Username}");
+            var values = (object[])value;
+            var uiContent = (object)values[1];
+            var Id = (int)values[0];
 
+            var accountLoad = Accounts.Where(x => x.Id == Id).FirstOrDefault();
+            Username = accountLoad.Username;
+            UID = accountLoad.UID;
+            Level = accountLoad.Level;
+
+            OnEditAccountShowDialog(values);
         }
 
         [RelayCommand]
@@ -210,12 +217,12 @@ namespace SRSwitcher.ViewModels.Pages
         }
 
         [RelayCommand]
-        private async Task OnShowDialog(object content)
+        private async Task OnAddAccountShowDialog(object content)
         {
             var result = await _contentDialogService.ShowSimpleDialogAsync(
                 new SimpleContentDialogCreateOptions()
                 {
-                    Title = "Save an Account",
+                    Title = "Save Account",
                     Content = content,
                     PrimaryButtonText = "Save",
                     CloseButtonText = "Cancel",
@@ -226,6 +233,62 @@ namespace SRSwitcher.ViewModels.Pages
             {
                 case ContentDialogResult.Primary:
                     AddAccount();
+                    DialogResultText = "User saved their work";
+                    break;
+                default:
+                    DialogResultText = "User cancelled the dialog";
+                    break;
+            }
+            //DialogResultText = result switch
+            //{
+            //    ContentDialogResult.Primary => AddAccount(),
+            //    ContentDialogResult.Secondary => "User did not save their work",
+            //    _ => "User cancelled the dialog"
+            //};
+        }
+
+        [RelayCommand]
+        private async Task OnEditAccountShowDialog(object[] content)
+        {
+            var values = (object[])content;
+            var uiContent = (object)values[1];
+            var Id = (int)values[0];
+            var result = await _contentDialogService.ShowSimpleDialogAsync(
+                new SimpleContentDialogCreateOptions()
+                {
+                    Title = "Edit Account",
+                    Content = uiContent,
+                    PrimaryButtonText = "Save",
+                    CloseButtonText = "Cancel",
+                }
+            );
+
+            switch (result)
+            {
+                case ContentDialogResult.Primary:
+                    var account = Accounts.Where(x => x.Id == Id).First();
+                    if (account.Username != string.Empty && account.UID != string.Empty && account.Level != 0)
+                    {
+                        int index = Accounts.IndexOf(account);
+                        Accounts[index] = new Account
+                        {
+                            Id = account.Id,
+                            Username = Username,
+                            UID = UID,
+                            Level = Level,
+                            Img = account.Img,
+                            Server = account.Server,
+                            Token = account.Token,
+                            ModifiedDate = DateTime.Now,
+                            CreatedDate = account.CreatedDate
+                        };
+
+                        // Save the modified data to JSON
+                        string json = JsonConvert.SerializeObject(Accounts, Formatting.Indented);
+                        File.WriteAllText("accounts.json", json);
+                        LoadData();
+                        Debug.WriteLine($"Edited {Accounts.Where(x => x.Id == Id).FirstOrDefault().Username} Account");
+                    }
                     DialogResultText = "User saved their work";
                     break;
                 default:
